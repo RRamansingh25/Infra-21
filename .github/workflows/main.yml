@@ -2,15 +2,29 @@ name: Terraform Infrastructure Deployment
 
 on:
   workflow_dispatch:
+permissions:
+  contents: read
 
 jobs:
   my_job:
     name: Deploy to Staging
     runs-on: ubuntu-22.04
 
+    defaults:
+      run:
+        working-directory: environments/dev
+    env:
+       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+       ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+     
+
     steps:
-      - name: Checkout Code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Print Hello
-        run: echo "GitHub Actions is working!"
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
